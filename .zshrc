@@ -28,13 +28,16 @@ HIST_STAMPS="mm/dd/yyyy"
 # Standard plugins: $ZSH/plugins/
 # Custom plugins: $ZSH_CUSTOM/plugins/
 plugins=(
-  git
-  vscode
-  zsh-completions
-  zsh-interactive-cd
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-  )
+    bazel
+    git
+    macos #https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/macos
+    sublime
+    vscode # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/vscode
+    zsh-completions
+    zsh-interactive-cd
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+)
 
 #Autocompletions
 fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
@@ -46,19 +49,28 @@ source $ZSH/oh-my-zsh.sh
 # Personal 'alias's
 
 # Update Homebrew data, formulae, and casks, then run cleanup
-alias bup="brew update && brew upgrade && brew cleanup && brew autoremove"
-#quick alias to desktiop
+alias bup="brew update && brew upgrade && \
+if [ \$(brew list --cask | wc -l) -gt 0 ]; then \
+  for cask in \$(brew list --cask); do \
+    brew upgrade --cask \"\$cask\"; \
+  done; \
+fi && \
+brew autoremove && brew cleanup --prune=all"
+# Homebrew uninstall with zap
+alias buz="brew uninstall --zap"
+
+# quick alias to desktop
 alias desk="cd ~/Desktop"
 # get machine's ip address
 alias ip="ipconfig getifaddr en0"
-#alias code-insiders -> code; python3 -> python
-alias code="code-insiders"
+#alias python3 -> python
 alias python="python3"
 
 #edit global zsh configuration
 alias zshconfig="code ~/.zshrc"
 # reload zsh configuration
 alias zshsource="source ~/.zshrc"
+
 # reload zsh configuration
 alias ohmyzsh="cd ~/.oh-my-zsh"
 
@@ -82,13 +94,13 @@ alias sublime="/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl -
 
 # load zsh-completions
 autoload -U compinit && compinit
-#TheFuck console error correction
+
+# TheFuck console error correction
 eval $(thefuck --alias)
 
-# NVM Configuration
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# fnm Configuartion
+export PATH="/Users/drew/Library/Application Support/fnm:$PATH"
+eval "$(fnm env --use-on-cd)"
 
 # pnpm Configuration
 export PNPM_HOME="/Users/drewgiacomi/Library/pnpm"
@@ -109,6 +121,8 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+PATH=~/.console-ninja/.bin:$PATH
+[[ -s "/Users/drew/.gvm/scripts/gvm" ]] && source "/Users/drew/.gvm/scripts/gvm"
+
 # Starship must come at the end!
 eval "$(starship init zsh)"
-
